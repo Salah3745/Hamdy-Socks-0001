@@ -32,8 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const deliveryCostEgyptMadaeen = 25; // تكلفة التوصيل للمعادي وحدائق المعادي ودار السلام
     const deliveryCostOtherLocations = 40; // تكلفة التوصيل لأي مكان آخر
 
-    let currentDeliveryCost = 0; // متغير لتخزين تكلفة التوصيل الحالية
-
     // --- Functions ---
 
     // 1. Language Toggle Functionality
@@ -178,7 +176,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         updateCartDisplay();
-        alert(`${productName} (الكمية: ${quantity}) ${currentLanguage === 'ar' ? 'تمت إضافته إلى السلة!' : 'added to cart!'}`);
+        // تعديل بسيط هنا لجعل الرسالة أكثر وضوحاً
+        const addedMessage = currentLanguage === 'ar' 
+            ? `تمت إضافة ${productName} (الكمية: ${quantity}) إلى السلة!`
+            : `Added ${productName} (Quantity: ${quantity}) to cart!`;
+        alert(addedMessage);
     }
 
     function updateQuantity(productId, change) {
@@ -230,6 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cartModal) {
             cartModal.style.display = 'none';
             resetDeliveryForm();
+            // عند إغلاق المودال، أعد عرض قسم المنتجات وليس نموذج الدفع
             if(cartItemsSection) cartItemsSection.style.display = 'block';
             if(paymentFormContainer) paymentFormContainer.style.display = 'none';
         }
@@ -240,16 +243,17 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(currentLanguage === 'ar' ? 'عربة التسوق فارغة!' : 'Your shopping cart is empty!');
             return;
         }
+        // إخفاء قسم المنتجات وإظهار نموذج الدفع
         if(cartItemsSection) cartItemsSection.style.display = 'none';
         if(paymentFormContainer) paymentFormContainer.style.display = 'block';
         resetDeliveryForm();
+        // تحديث النص حسب اللغة
+        updateDeliveryFormPlaceholders(currentLanguage);
     }
 
     function resetDeliveryForm() {
-        if (inputFullName) inputFullName.value = '';
-        if (inputPhoneNumber) inputPhoneNumber.value = '';
-        if (inputAddress) inputAddress.value = '';
-        if (inputDeliveryTime) inputDeliveryTime.value = '';
+        if (deliveryForm) deliveryForm.reset(); // استخدم reset() لمسح كل الحقول
+        // إعادة تعيين أزرار خيارات الدفع (إذا كانت موجودة)
         paymentOptionsButtons.forEach(btn => btn.classList.remove('selected'));
     }
 
@@ -260,6 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const deliveryTimeLabel = document.querySelector('label[for="delivery_time"]');
         const separatorText = document.querySelector('.separator p');
         const checkoutButton = document.getElementById('final-checkout-btn');
+        const paymentTriggerButton = document.querySelector('.payment-trigger-btn'); // Button to go to payment
 
         if (lang === 'en') {
             if (fullNameLabel) fullNameLabel.textContent = 'Full Name';
@@ -274,6 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (separatorText) separatorText.textContent = 'or enter delivery details';
             if (checkoutButton) checkoutButton.textContent = 'Submit Order';
+            if (paymentTriggerButton) paymentTriggerButton.textContent = 'Proceed to Payment'; // Update button text
         } else { // Arabic
             if (fullNameLabel) fullNameLabel.textContent = 'الاسم الكامل';
             if (phoneNumberLabel) phoneNumberLabel.textContent = 'رقم الهاتف';
@@ -287,6 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (separatorText) separatorText.textContent = 'أو أدخل بيانات الاستلام';
             if (checkoutButton) checkoutButton.textContent = 'إتمام الطلب';
+            if (paymentTriggerButton) paymentTriggerButton.textContent = 'الانتقال للدفع'; // Update button text
         }
     }
 
@@ -306,12 +313,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function handleOrderSubmission() {
-        if (!inputFullName.value.trim() || !inputPhoneNumber.value.trim() || !inputAddress.value.trim()) {
-            alert(currentLanguage === 'ar' ? 'يرجى ملء جميع حقول الاستلام الإلزامية (الاسم، الهاتف، العنوان).' : 'Please fill in all required delivery fields (Name, Phone, Address).');
+    // === NEW FUNCTION: Send Order via WhatsApp ===
+    function sendOrderViaWhatsApp() {
+        // 1. التحقق من أن العربة ليست فارغة
+        if (cart.length === 0) {
+            alert(currentLanguage === 'ar' ? 'عربة التسوق فارغة!' : 'Your shopping cart is empty!');
             return;
         }
 
+        // 2. جمع تفاصيل المنتجات في الطلب
+        let orderDetailsString = "";
+        let totalOrderPrice = 0;
+
+        cart.forEach(item => {
+            orderDetailsString += `- ${item.name} (الكمية: ${item.quantity}) - السعر: ${item.price.toFixed(2)} ${currentLanguage === 'ar' ? 'ج.م' : 'EGP'}\n`;
+            totalOrderPrice += item.price * item.quantity;
+        });
+
+        // 3. جمع بيانات الاستلام من النموذج
+        const inputFullName = document.getElementById('full_name');
+        const inputPhoneNumber = document.getElementById('phone_number');
+        const inputAddress = document.getElementById('address');
+        const inputDeliveryTime = document.getElementById('delivery_time');
+
+        // التحقق من ملء الحقول الإلزامية
+        if (!inputFullName || !inputFullName.value.trim() || !inputPhoneNumber || !inputPhoneNumber.value.trim() || !inputAddress || !inputAddress.value.trim()) {
+            alert(currentLanguage === 'ar' ? 'يرجى ملء جميع حقول الاستلام الإلزامية (الاسم، الهاتف، العنوان).' : 'Please fill in all required delivery fields (Name, Phone, Address).');
+            return;
+        }
+        
+        // حساب تكلفة التوصيل
+        let currentDeliveryCost = 0;
         const lowerCaseAddress = inputAddress.value.trim().toLowerCase();
         if (lowerCaseAddress.includes('المعادي') || lowerCaseAddress.includes('حدائق المعادي') || lowerCaseAddress.includes('دار السلام')) {
             currentDeliveryCost = deliveryCostEgyptMadaeen;
@@ -319,64 +351,67 @@ document.addEventListener('DOMContentLoaded', () => {
             currentDeliveryCost = deliveryCostOtherLocations;
         }
 
-        let orderDetails = "طلب جديد:\n";
-        let totalOrderPrice = 0;
-
-        if (cart.length === 0) {
-            alert(currentLanguage === 'ar' ? 'عربة التسوق فارغة!' : 'Your shopping cart is empty!');
-            return;
-        }
-
-        cart.forEach(item => {
-            orderDetails += `- ${item.name} (الكمية: ${item.quantity}) - السعر: ${item.price.toFixed(2)} ${currentLanguage === 'ar' ? 'ج.م' : 'EGP'}\n`;
-            totalOrderPrice += item.price * item.quantity;
-        });
-
         const finalTotalPrice = totalOrderPrice + currentDeliveryCost;
 
-        const orderSummary = `
-        --- تفاصيل الطلب ---
-        اسم العميل: ${inputFullName.value.trim()}
-        رقم الهاتف: ${inputPhoneNumber.value.trim()}
-        العنوان: ${inputAddress.value.trim()}
-        وقت التسليم المفضل: ${inputDeliveryTime.value.trim() || 'غير محدد'}
-        تكلفة التوصيل: ${currentDeliveryCost} ${currentLanguage === 'ar' ? 'ج.م' : 'EGP'}
-        ------
-        المنتجات:
-        ${orderDetails}
-        ------
-        الإجمالي: ${finalTotalPrice.toFixed(2)} ${currentLanguage === 'ar' ? 'ج.م' : 'EGP'}
+        // 4. تجميع رسالة الواتساب الكاملة
+        const whatsappMessage = `
+--- تفاصيل طلب جديد ---
+اسم العميل: ${inputFullName.value.trim()}
+رقم الهاتف: ${inputPhoneNumber.value.trim()}
+العنوان: ${inputAddress.value.trim()}
+وقت التسليم المفضل: ${inputDeliveryTime && inputDeliveryTime.value.trim() ? inputDeliveryTime.value.trim() : 'غير محدد'}
+--------------------
+المنتجات المطلوبة:
+${orderDetailsString}
+--------------------
+تكلفة التوصيل: ${currentDeliveryCost} ${currentLanguage === 'ar' ? 'ج.م' : 'EGP'}
+الإجمالي النهائي: ${finalTotalPrice.toFixed(2)} ${currentLanguage === 'ar' ? 'ج.م' : 'EGP'}
         `;
 
-        const encodedMessage = encodeURIComponent(orderSummary);
-        
-        const whatsappBaseLink = 'https://wa.me/2001554728811?text=';
-        const whatsappLink = whatsappBaseLink + encodedMessage;
+        // 5. تشفير الرسالة لتكون صالحة للينك
+        const encodedMessage = encodeURIComponent(whatsappMessage);
 
-        window.location.href = whatsappLink;
+        // 6. رقم الهاتف (تأكد من صحته وخلوه من المسافات أو الرموز)
+        // استخدام الرقم من اللينك الذي قدمته: 2001554728811
+        const phoneNumber = '2001554728811'; 
 
-        alert(currentLanguage === 'ar' ? `تم إرسال تفاصيل الطلب إلى الواتساب. تكلفة التوصيل: ${currentDeliveryCost} ج.م. يرجى تأكيد الطلب هناك.` : `Order details sent to WhatsApp. Delivery cost: ${currentDeliveryCost} EGP. Please confirm your order there.`);
-        cart = [];
-        updateCartDisplay();
-        closeCartModal();
-        resetDeliveryForm();
+        // 7. بناء الرابط النهائي
+        const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+
+        // 8. توجيه المستخدم إلى رابط الواتساب في نافذة جديدة
+        window.open(whatsappLink, '_blank');
+
+        // 9. إظهار رسالة تأكيد للمستخدم
+        alert(currentLanguage === 'ar' 
+            ? `تم إرسال طلبك إلى واتساب لتأكيده. يرجى إكمال الخطوات هناك.\nتكلفة التوصيل: ${currentDeliveryCost} ${currentLanguage === 'ar' ? 'ج.م' : 'EGP'}`
+            : `Your order has been sent to WhatsApp for confirmation. Please complete the steps there.\nDelivery Cost: ${currentDeliveryCost} ${currentLanguage === 'ar' ? 'EGP' : 'EGP'}`);
+
+        // 10. (اختياري) إفراغ العربة وإغلاق المودال بعد إرسال الطلب
+        // إذا أردت إفراغ العربة تلقائياً بعد الضغط على زر الإتمام:
+        // cart = [];
+        // updateCartDisplay();
+        // closeCartModal();
     }
 
-    // Function to update the cart display and count
+    // --- End of NEW FUNCTION ===
+
+    // وظيفة لتحديث سلة التسوق (تم تعديلها قليلاً)
     function updateCartDisplay() {
         cartItemsList.innerHTML = '';
         let total = 0;
         let totalItems = 0;
 
+        // ترتيب المنتجات حسب الـ ID لضمان ثبات الترتيب
         cart.sort((a, b) => a.id.localeCompare(b.id));
 
         if (cart.length === 0) {
             cartItemsList.innerHTML = `<li>${currentLanguage === 'ar' ? 'عربة التسوق فارغة.' : 'Your shopping cart is empty.'}</li>`;
             cartTotalPrice.textContent = `0.00 ${currentLanguage === 'ar' ? 'ج.م' : 'EGP'}`;
             
-            if(paymentFormContainer) paymentFormContainer.style.display = 'none';
+            // عند تفريغ العربة، تأكد من أن زر "الانتقال للدفع" لا يزال ظاهرًا
             if(paymentTriggerBtn) paymentTriggerBtn.style.display = 'block';
             if(cartItemsSection) cartItemsSection.style.display = 'block';
+            if(paymentFormContainer) paymentFormContainer.style.display = 'none';
             
         } else {
             cart.forEach(item => {
@@ -394,6 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             cartTotalPrice.textContent = `${total.toFixed(2)} ${currentLanguage === 'ar' ? 'ج.م' : 'EGP'}`;
 
+            // تأكد من أن الأزرار تظهر بشكل صحيح عندما تكون العربة ممتلئة
             if(paymentTriggerBtn) paymentTriggerBtn.style.display = 'block';
             if(cartItemsSection) cartItemsSection.style.display = 'block';
             if(paymentFormContainer) paymentFormContainer.style.display = 'none';
@@ -404,28 +440,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to update the item count on cart icons
     function updateCartIconCounters(count) {
-        const floatingCartCounter = cartItemCountFloating; // Use the variable defined earlier
+        const floatingCartCounter = cartItemCountFloating;
         
         if (floatingCartCounter) {
             if (count > 0) {
                 floatingCartCounter.textContent = count;
-                floatingCartCounter.style.display = 'flex';
+                floatingCartCounter.style.display = 'flex'; // Use flex to center the number if needed
             } else {
                 floatingCartCounter.style.display = 'none';
             }
         }
-
-        // If you have a counter for the header cart button, update it here.
-        // For example, if you had <span id="header-cart-counter"></span> in your header nav:
-        // const headerCartCounter = document.getElementById('header-cart-counter');
-        // if (headerCartCounter) {
-        //     if (count > 0) {
-        //         headerCartCounter.textContent = count;
-        //         headerCartCounter.style.display = 'inline-block';
-        //     } else {
-        //         headerCartCounter.style.display = 'none';
-        //     }
-        // }
     }
 
     // --- Event Listeners ---
@@ -448,7 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Floating Cart Button - Open Modal
     if (floatingCartButton) {
         floatingCartButton.addEventListener('click', (e) => {
-            e.preventDefault();
+            e.preventDefault(); // منع السلوك الافتراضي للينك
             openCartModal();
         });
     }
@@ -461,6 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Close Modal if clicked outside of content
     if (cartModal) {
         window.addEventListener('click', (event) => {
+            // تأكد أننا ننقر خارج الـ modal-content
             if (event.target === cartModal) {
                 closeCartModal();
             }
@@ -469,28 +494,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add to Cart Buttons & Quantity Control
     document.querySelectorAll('.product-card').forEach(card => {
-        const productId = card.querySelector('.add-to-cart').dataset.id;
-        const addToCartButton = card.querySelector('.input.add-to-cart'); // The checkbox itself
+        const productId = card.dataset.id; // استخدام data-id مباشرة
+        const addToCartCheckbox = card.querySelector('.input.add-to-cart'); 
         const minusBtn = card.querySelector('.minus-btn');
         const plusBtn = card.querySelector('.plus-btn');
 
-        addToCartButton.addEventListener('click', (e) => {
-            if (e.target.checked) {
+        // إذا لم تكن هناك أزرار +/-، يمكنك إضافتها هنا أو التأكد من وجودها في HTML
+
+        // Event listener for the checkbox (Add to Cart toggle)
+        if (addToCartCheckbox) {
+            addToCartCheckbox.addEventListener('change', (e) => {
+                const isChecked = e.target.checked;
                 const productName = card.querySelector('.product-title').textContent;
+                // استخراج السعر وتنظيفه
                 const productPriceStr = card.querySelector('.product-price').textContent.replace(/[^0-9.-]+/g, "");
                 const productPrice = parseFloat(productPriceStr);
 
                 if (productId && productName && !isNaN(productPrice)) {
-                    addToCart(productId, productName, productPrice);
+                    if (isChecked) {
+                        addToCart(productId, productName, productPrice);
+                    } else {
+                        removeItemFromCart(productId);
+                    }
                 } else {
                     console.error('Could not get product details for:', card);
-                    e.target.checked = false;
+                    e.target.checked = !isChecked; // إعادة الحالة إلى ما كانت عليه
                 }
-            } else {
-                removeItemFromCart(productId);
-            }
-        });
-
+            });
+        }
+        
+        // Event listeners for quantity buttons
         if (minusBtn) {
             minusBtn.addEventListener('click', () => updateQuantity(productId, -1));
         }
@@ -512,11 +545,12 @@ document.addEventListener('DOMContentLoaded', () => {
         paymentTriggerBtn.addEventListener('click', showDeliveryForm);
     }
 
-    // Handle final order submission from the delivery form
+    // Handle final order submission from the delivery form - NOW TRIGGERS WHATSAPP
     if (finalCheckoutBtn) {
-        finalCheckoutBtn.addEventListener('click', handleOrderSubmission);
+        finalCheckoutBtn.addEventListener('click', sendOrderViaWhatsApp); // <<-- تم التعديل هنا
     }
     
+    // Handle payment option button clicks (visual selection)
     paymentOptionsButtons.forEach(button => {
         button.addEventListener('click', () => {
             paymentOptionsButtons.forEach(btn => btn.classList.remove('selected'));
@@ -525,15 +559,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Initial Setup ---
+    // تطبيق اللغة والوضع الليلي عند تحميل الصفحة
     applyLanguage(currentLanguage);
     applyDarkMode(currentMode);
-    updateCartDisplay();
+    updateCartDisplay(); // تحديث عرض العربة عند التحميل (لعرض المنتجات المحفوظة إذا كانت موجودة)
     updateContactFormPlaceholders(currentLanguage);
-    updateDeliveryFormPlaceholders(currentLanguage);
+    updateDeliveryFormPlaceholders(currentLanguage); // تأكد من تحديث الحقول حسب اللغة عند التحميل
 });
 
 // --- Mobile Menu Toggle ---
-document.addEventListener('DOMContentLoaded', () => { // This is a duplicate DOMContentLoaded, it might be better to combine if all event listeners are here
+// هذا الجزء يبدو أنه مكرر في الكود الأصلي، يفضل دمجه مع DOMContentLoaded الرئيسي
+// أو التأكد من عدم وجود تعارض. سأبقي عليه هنا للحفاظ على الكود الأصلي.
+document.addEventListener('DOMContentLoaded', () => { 
   const menuIcon = document.getElementById('menu-icon');
   const navLinks = document.getElementById('nav-links');
 
@@ -562,12 +599,14 @@ document.addEventListener('DOMContentLoaded', () => { // This is a duplicate DOM
     body.classList.remove('dark-mode');
   }
 
-  darkModeToggle.addEventListener('click', () => {
-    body.classList.toggle('dark-mode');
-    if (body.classList.contains('dark-mode')) {
-      localStorage.setItem('darkMode', 'dark');
-    } else {
-      localStorage.setItem('darkMode', 'light');
-    }
-  });
+  if (darkModeToggle) { // تأكد من وجود الزر قبل إضافة المستمع
+      darkModeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+        if (body.classList.contains('dark-mode')) {
+          localStorage.setItem('darkMode', 'dark');
+        } else {
+          localStorage.setItem('darkMode', 'light');
+        }
+      }); 
+  }
 });
