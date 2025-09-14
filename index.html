@@ -6,6 +6,7 @@
   <title>HAMDY SOCKS</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+  
   <style>
     /* سيتم وضع CSS الجديد هنا أو في ملف style.css */
   </style>
@@ -112,7 +113,7 @@
               <button class="quantity-btn plus-btn" aria-label="زيادة الكمية">+</button>
             </div>
           </div>
-          <span class="product-price">20 ج.م</span>
+          <span class="product-price">300 ج.م</span>
         </div>
 
         <div class="product-card" data-id="sock003">
@@ -166,7 +167,7 @@
               <button class="quantity-btn plus-btn" aria-label="زيادة الكمية">+</button>
             </div>
           </div>
-          <span class="product-price">90 ج.م</span>
+          <span class="product-price">490 ج.م</span>
         </div>
 
         <div class="product-card" data-id="sock005">
@@ -528,10 +529,17 @@
 
     </div>
   </div>
-
+<!-- الزر العائم لعربة التسوق -->
+<!-- تغيير href="" ليصبح href="#" لنتحكم به عبر JS -->
+<a href="#" id="floating-cart-button" class="floating-cart-button-svg">
+    <!-- كود SVG الخاص بالأيقونة الذي أرسلته -->
+    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+        <path d="m480-560-56-56 63-64H320v-80h167l-64-64 57-56 160 160-160 160ZM280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM40-800v-80h131l170 360h280l156-280h91L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68.5-39t-1.5-79l54-98-144-304H40Z"/>
+    </svg>
+    <!-- (اختياري) عنصر لعرض عدد المنتجات -->
+    <span class="cart-item-count-svg">0</span>
+</a>
   <script src="main.js"></script>
+  
 </body>
-
 </html>
-
-
