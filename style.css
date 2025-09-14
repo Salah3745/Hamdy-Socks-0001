@@ -1,4 +1,4 @@
-/* Variables (optional but good practice) */
+
 :root {
   --primary-color: #4c51bf; /* Indigo-600 */
   --secondary-color: #667eea; /* Indigo-400 */
@@ -1359,3 +1359,4 @@ body.dark-mode .label .title {
 }
 
 /* ... باقي الكود ... */
+
