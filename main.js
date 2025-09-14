@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const whatsappLink = whatsappBaseLink + encodedMessage;
 
         // Redirect the user to WhatsApp
-        window.location.href = whatsappLink;
+        window.open(whatsappLink, '_blank');
 
         alert(currentLanguage === 'ar' ? `تم إرسال تفاصيل الطلب إلى الواتساب. تكلفة التوصيل: ${currentDeliveryCost} ج.م. يرجى تأكيد الطلب هناك.` : `Order details sent to WhatsApp. Delivery cost: ${currentDeliveryCost} EGP. Please confirm your order there.`);
         cart = [];
@@ -621,3 +621,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
