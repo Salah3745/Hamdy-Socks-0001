@@ -1311,5 +1311,51 @@ body.dark-mode ::placeholder { /* Firefox, Opera, Safari 10.1+ */
 body.dark-mode .label .title {
   color: #fff;
 }
+/* ستايل الدائرة الزرقاء الثابتة */
+.floating-cart-button-svg {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background-color: #007bff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    z-index: 1000;
+    cursor: pointer; /* اجعل شكل المؤشر يدل على أنه قابل للنقر */
+    transition: background-color 0.3s ease;
+}
+
+.floating-cart-button-svg:hover {
+    background-color: #0056b3;
+}
+
+/* ستايل أيقونة SVG المضمنة */
+.floating-cart-button-svg svg {
+    width: 30px;
+    height: 30px;
+    fill: #e3e3e3;
+}
+
+/* (اختياري) ستايل عدد المنتجات */
+.floating-cart-button-svg .cart-item-count-svg {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    font-weight: bold;
+}
 
 /* ... باقي الكود ... */
