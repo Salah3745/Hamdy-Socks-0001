@@ -2,11 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Variables ---
     const languageToggleBtn = document.getElementById('language-toggle');
     const darkModeToggleBtn = document.getElementById('dark-mode-toggle');
-    const cartButton = document.getElementById('cart-button');
+    const cartButton = document.getElementById('cart-button'); // Button in header
+    const floatingCartButton = document.getElementById('floating-cart-button'); // Floating button
     const cartModal = document.getElementById('cart-modal');
     const closeModalButton = document.getElementById('close-modal');
     const cartItemsList = document.getElementById('cart-items-list');
     const cartTotalPrice = document.getElementById('cart-total-price');
+    const cartItemCountFloating = floatingCartButton ? floatingCartButton.querySelector('.cart-item-count-svg') : null; // Counter for the floating button
     const addToCartButtons = document.querySelectorAll('.add-to-cart');
     const paymentTriggerBtn = document.querySelector('.payment-trigger-btn'); // Button to switch to delivery form
     const finalCheckoutBtn = document.getElementById('final-checkout-btn'); // The actual submit order button
@@ -20,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputPhoneNumber = document.getElementById('phone_number');
     const inputAddress = document.getElementById('address');
     const inputDeliveryTime = document.getElementById('delivery_time');
-    // Removed old payment input variables
 
     let currentLanguage = localStorage.getItem('language') || 'ar'; // Default to Arabic
     let currentMode = localStorage.getItem('darkMode') || 'light'; // Default to light mode
@@ -50,48 +51,29 @@ document.addEventListener('DOMContentLoaded', () => {
             // Switch to English
             langToggleBtn.textContent = 'AR';
             body.dir = 'ltr';
-            body.style.textAlign = 'left'; // Align text to left for LTR
+            body.style.textAlign = 'left';
 
-            // Change visible text content
             document.querySelector('.logo').textContent = 'HAMDY SOCKS';
             document.querySelector('#home h2').textContent = 'Best Socks For You';
             document.querySelector('#home p').textContent = 'Discover a collection of comfortable and stylish socks for all occasions';
-            // document.querySelector('.hero .btn').textContent = 'View Products'; // Assuming this is the hero button
 
             document.querySelector('#products .section-title').textContent = 'Our Products';
 
-            // Update product titles and descriptions (MANUALLY UPDATED ARRAYS - ENGLISH)
             const productTitles = [
-                'ADIDAS WHITE', // Corrected based on HTML
-                'ADIDAS BLACK', // Corrected based on HTML
-                'adidas colors', // Corrected based on HTML
-                '2 lines adidas', // Corrected based on HTML
-                'nike colors (shorts)',
-                'nike colors',
-                'NBA',
-                'just do it (short)',
-                'chicken'
+                'ADIDAS WHITE', 'ADIDAS BLACK', 'adidas colors', '2 lines adidas',
+                'nike colors (shorts)', 'nike colors', 'NBA', 'just do it (short)', 'chicken'
             ];
             const productDescriptions = [
-                'Comfortable and warm for daily use', // Corrected based on HTML
-                'Designed for sports and high performance', // Corrected based on HTML
-                'For special occasions and formal look', // Corrected based on HTML
-                'Perfect for the cold seasons', // Corrected based on HTML
-                'nike colors (shorts)',
-                'nike colors',
-                'NBA',
-                'just do it (short)',
-                'chicken'
+                'Comfortable and warm for daily use', 'Designed for sports and high performance', 'For special occasions and formal look',
+                'Perfect for the cold seasons', 'nike colors (shorts)', 'nike colors', 'NBA', 'just do it (short)', 'chicken'
             ];
 
             document.querySelectorAll('.product-card').forEach((card, index) => {
-                // Ensure index is within bounds for the specific card
                 if (index < productTitles.length) {
                     card.querySelector('.product-title').textContent = productTitles[index];
                     card.querySelector('.product-description').textContent = productDescriptions[index];
                 }
             });
-            // Update button text specifically for Add to Cart
              document.querySelectorAll('.label .title').forEach(el => el.textContent = 'Add to Cart');
              document.querySelectorAll('.label .title:last-child').forEach(el => el.textContent = 'Added');
 
@@ -99,84 +81,58 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('#about .section-title').textContent = 'About Us';
             document.querySelector('.about-text').textContent = 'We specialize in providing the best types of socks that combine comfort, elegance, and quality. Whether you\'re looking for daily, sports, or even medical socks, we have something to suit every lifestyle.';
 
-            // Contact Section
-            document.querySelector('.contact-title-wrapper h2').textContent = 'Contact Us'; // Title remains English as per HTML
-            document.querySelector('.contact-title-wrapper p').textContent = 'Have questions? Feel free to reach out'; // Text remains English as per HTML
+            document.querySelector('.contact-title-wrapper h2').textContent = 'Contact Us';
+            document.querySelector('.contact-title-wrapper p').textContent = 'Have questions? Feel free to reach out';
             
-            // Cart Modal / Delivery Form
-            document.querySelector('.modal-content h2').textContent = 'Shopping Cart'; // Title before delivery form
+            document.querySelector('.modal-content h2').textContent = 'Shopping Cart';
             document.querySelector('.cart-total strong').textContent = 'Total:';
-            if (paymentTriggerBtn) paymentTriggerBtn.textContent = 'Proceed to Payment'; // Button to show delivery form
+            if (paymentTriggerBtn) paymentTriggerBtn.textContent = 'Proceed to Payment';
             
-            // Update placeholders and button text for delivery form
             updateDeliveryFormPlaceholders('en');
 
 
-        } else {
-            // Switch to Arabic
+        } else { // Switch to Arabic
             langToggleBtn.textContent = 'EN';
             body.dir = 'rtl';
-            body.style.textAlign = 'right'; // Align text to right for RTL
+            body.style.textAlign = 'right';
 
-            // Change visible text content back to Arabic
-            document.querySelector('.logo').textContent = 'HAMDY SOCKS'; // Logo remains the same
+            document.querySelector('.logo').textContent = 'HAMDY SOCKS';
             document.querySelector('#home h2').textContent = 'أفضل الشرابات لكم';
             document.querySelector('#home p').textContent = 'اكتشف مجموعة من الشرابات المريحة والأنيقة لكل المناسبات';
-            // document.querySelector('.hero .btn').textContent = 'عرض المنتجات'; // Assuming this is the hero button
 
             document.querySelector('#products .section-title').textContent = 'منتجاتنا';
 
-            // Update product titles and descriptions back to Arabic (MANUALLY UPDATED ARRAYS)
             const productTitles = [
-                'ADIDAS WHITE', // Corrected based on HTML
-                'ADIDAS BLACK', // Corrected based on HTML
-                'adidas colors', // Corrected based on HTML
-                '2 lines adidas', // Corrected based on HTML
-                'nike colors (shorts)',
-                'nike colors',
-                'NBA',
-                'just do it (short)',
-                'chicken'
+                'ADIDAS WHITE', 'ADIDAS BLACK', 'adidas colors', '2 lines adidas',
+                'nike colors (shorts)', 'nike colors', 'NBA', 'just do it (short)', 'chicken'
             ];
             const productDescriptions = [
-                'مريحة ودافئة للاستخدام اليومي', // Corrected based on HTML
-                'مصممة للرياضة والأداء العالي', // Corrected based on HTML
-                'للمناسبات الخاصة والإطلالة الرسمية', // Corrected based on HTML
-                'مثالية للفصول الباردة', // Corrected based on HTML
-                'nike colors (shorts)',
-                'nike colors',
-                'NBA',
-                'just do it (short)',
-                'chicken'
+                'مريحة ودافئة للاستخدام اليومي', 'مصممة للرياضة والأداء العالي', 'للمناسبات الخاصة والإطلالة الرسمية',
+                'مثالية للفصول الباردة', 'nike colors (shorts)', 'nike colors', 'NBA', 'just do it (short)', 'chicken'
             ];
 
             document.querySelectorAll('.product-card').forEach((card, index) => {
-                 // Ensure index is within bounds for the specific card
-                if (index < productTitles.length) {
+                 if (index < productTitles.length) {
                     card.querySelector('.product-title').textContent = productTitles[index];
                     card.querySelector('.product-description').textContent = productDescriptions[index];
                 }
             });
-            // Update button text specifically for Add to Cart
             document.querySelectorAll('.label .title').forEach(el => el.textContent = 'أضف للسلة');
             document.querySelectorAll('.label .title:last-child').forEach(el => el.textContent = 'تم الاضافة');
 
             document.querySelector('#about .section-title').textContent = 'عنا';
             document.querySelector('.about-text').textContent = 'نحن متخصصون في تقديم أفضل أنواع الشرابات التي تجمع بين الراحة، الأناقة، والجودة. سواء كنت تبحث عن شرابات يومية أو رياضية أو حتى طبية، لدينا ما يناسب كل أسلوب حياة.';
 
-            // Contact Section
-            document.querySelector('.contact-title-wrapper h2').textContent = 'Contact Us'; // Title remains English
-            document.querySelector('.contact-title-wrapper p').textContent = 'Have questions? Feel free to reach out'; // Text remains English
+            document.querySelector('.contact-title-wrapper h2').textContent = 'Contact Us';
+            document.querySelector('.contact-title-wrapper p').textContent = 'Have questions? Feel free to reach out';
             
-            // Cart Modal / Delivery Form
             document.querySelector('.modal-content h2').textContent = 'عربة التسوق';
             document.querySelector('.cart-total strong').textContent = 'الإجمالي:';
-            if (paymentTriggerBtn) paymentTriggerBtn.textContent = 'الانتقال للدفع'; // Button to show delivery form
+            if (paymentTriggerBtn) paymentTriggerBtn.textContent = 'الانتقال للدفع';
             
-            // Update placeholders and button text for delivery form
             updateDeliveryFormPlaceholders('ar');
         }
-        updateCartDisplay(); // Update cart display with correct currency/language if needed
+        updateCartDisplay();
     }
 
 
@@ -216,21 +172,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const existingItemIndex = cart.findIndex(item => item.id === productId);
         
         if (existingItemIndex > -1) {
-            // لو المنتج موجود بالفعل، هنعدل الكمية بتاعته
             cart[existingItemIndex].quantity = quantity;
         } else {
-            // لو المنتج مش موجود، هنضيفه للسلة بالكمية المحددة
             cart.push({ id: productId, name: productName, price: productPrice, quantity: quantity });
         }
         
         updateCartDisplay();
         alert(`${productName} (الكمية: ${quantity}) ${currentLanguage === 'ar' ? 'تمت إضافته إلى السلة!' : 'added to cart!'}`);
-        
-        // Reset quantity input to 1 after adding to cart (optional)
-        // quantityInput.value = 1; 
     }
 
-    // Function to handle quantity changes (called from minus/plus buttons)
     function updateQuantity(productId, change) {
         const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
         if (!productCard) return;
@@ -238,33 +188,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const quantityInput = productCard.querySelector('.quantity-input');
         let currentQuantity = parseInt(quantityInput.value);
 
-        if (isNaN(currentQuantity)) currentQuantity = 1; // Default to 1 if invalid
+        if (isNaN(currentQuantity)) currentQuantity = 1;
 
         const newQuantity = currentQuantity + change;
 
         if (newQuantity >= 1) {
             quantityInput.value = newQuantity;
-            // If the item is already in the cart, update its quantity directly
             const itemIndex = cart.findIndex(item => item.id === productId);
             if (itemIndex > -1) {
                 cart[itemIndex].quantity = newQuantity;
-                updateCartDisplay(); // Update cart total dynamically
+                updateCartDisplay();
             }
         }
     }
 
-    // Function to remove an item from the cart and reset the UI
     function removeItemFromCart(productId) {
         cart = cart.filter(item => item.id !== productId);
         
-        // Reset the UI for the product card
         const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
         if (productCard) {
             const quantityInput = productCard.querySelector('.quantity-input');
             if (quantityInput) {
-                quantityInput.value = 1; // Reset quantity to 1
+                quantityInput.value = 1;
             }
-            // Reset the checkbox state if it was checked (though it might not be needed anymore)
             const checkbox = productCard.querySelector('.input.add-to-cart');
             if (checkbox) checkbox.checked = false;
         }
@@ -283,14 +229,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeCartModal() {
         if (cartModal) {
             cartModal.style.display = 'none';
-            resetDeliveryForm(); // Reset form fields when modal is closed
-            // Reset view to show cart items
+            resetDeliveryForm();
             if(cartItemsSection) cartItemsSection.style.display = 'block';
             if(paymentFormContainer) paymentFormContainer.style.display = 'none';
         }
     }
 
-    // Function to show the delivery form and hide cart details
     function showDeliveryForm() {
         if (cart.length === 0) {
             alert(currentLanguage === 'ar' ? 'عربة التسوق فارغة!' : 'Your shopping cart is empty!');
@@ -298,10 +242,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if(cartItemsSection) cartItemsSection.style.display = 'none';
         if(paymentFormContainer) paymentFormContainer.style.display = 'block';
-        resetDeliveryForm(); // Clear form fields each time it's shown
+        resetDeliveryForm();
     }
 
-    // Function to reset delivery form fields
     function resetDeliveryForm() {
         if (inputFullName) inputFullName.value = '';
         if (inputPhoneNumber) inputPhoneNumber.value = '';
@@ -310,7 +253,6 @@ document.addEventListener('DOMContentLoaded', () => {
         paymentOptionsButtons.forEach(btn => btn.classList.remove('selected'));
     }
 
-    // Function to update placeholders and text for delivery form based on language
     function updateDeliveryFormPlaceholders(lang) {
         const fullNameLabel = document.querySelector('label[for="full_name"]');
         const phoneNumberLabel = document.querySelector('label[for="phone_number"]');
@@ -348,9 +290,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Function to update placeholders for the contact form
     function updateContactFormPlaceholders(lang) {
-        const nameInput = document.querySelector('.contact-form input[type="text"]'); // Assuming name is first input
+        const nameInput = document.querySelector('.contact-form input[type="text"]');
         const emailInput = document.querySelector('.contact-form input[type="email"]');
         const messageTextarea = document.querySelector('.contact-form textarea');
 
@@ -365,29 +306,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
-    // Function to handle final order submission and redirect to WhatsApp
     function handleOrderSubmission() {
-        // Delivery details validation
         if (!inputFullName.value.trim() || !inputPhoneNumber.value.trim() || !inputAddress.value.trim()) {
             alert(currentLanguage === 'ar' ? 'يرجى ملء جميع حقول الاستلام الإلزامية (الاسم، الهاتف، العنوان).' : 'Please fill in all required delivery fields (Name, Phone, Address).');
             return;
         }
-        // Add more specific validation if needed
 
-        // --- Calculate Delivery Cost ---
-        const lowerCaseAddress = inputAddress.value.trim().toLowerCase(); // Ensure value is trimmed and in lowercase
+        const lowerCaseAddress = inputAddress.value.trim().toLowerCase();
         if (lowerCaseAddress.includes('المعادي') || lowerCaseAddress.includes('حدائق المعادي') || lowerCaseAddress.includes('دار السلام')) {
             currentDeliveryCost = deliveryCostEgyptMadaeen;
         } else {
             currentDeliveryCost = deliveryCostOtherLocations;
         }
 
-        // Prepare WhatsApp message
         let orderDetails = "طلب جديد:\n";
-        let totalOrderPrice = 0; // المبلغ الإجمالي للمنتجات فقط
+        let totalOrderPrice = 0;
 
-        if (cart.length === 0) { // Should ideally not happen if paymentTriggerBtn is only shown when cart has items
+        if (cart.length === 0) {
             alert(currentLanguage === 'ar' ? 'عربة التسوق فارغة!' : 'Your shopping cart is empty!');
             return;
         }
@@ -397,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
             totalOrderPrice += item.price * item.quantity;
         });
 
-        const finalTotalPrice = totalOrderPrice + currentDeliveryCost; // الإجمالي النهائي شامل التوصيل
+        const finalTotalPrice = totalOrderPrice + currentDeliveryCost;
 
         const orderSummary = `
         --- تفاصيل الطلب ---
@@ -415,12 +350,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const encodedMessage = encodeURIComponent(orderSummary);
         
-        // Your fixed WhatsApp link with the text parameter
-        const whatsappBaseLink = 'https://wa.me/2001554728811?text='; 
+        const whatsappBaseLink = 'https://wa.me/2001554728811?text=';
         const whatsappLink = whatsappBaseLink + encodedMessage;
 
-        // Redirect the user to WhatsApp
-        window.open(whatsappLink, '_blank');
+        window.location.href = whatsappLink;
 
         alert(currentLanguage === 'ar' ? `تم إرسال تفاصيل الطلب إلى الواتساب. تكلفة التوصيل: ${currentDeliveryCost} ج.م. يرجى تأكيد الطلب هناك.` : `Order details sent to WhatsApp. Delivery cost: ${currentDeliveryCost} EGP. Please confirm your order there.`);
         cart = [];
@@ -429,11 +362,12 @@ document.addEventListener('DOMContentLoaded', () => {
         resetDeliveryForm();
     }
 
-    // Update the cart display to include quantity
+    // Function to update the cart display and count
     function updateCartDisplay() {
-        cartItemsList.innerHTML = ''; // Clear existing items
+        cartItemsList.innerHTML = '';
         let total = 0;
-        
+        let totalItems = 0;
+
         cart.sort((a, b) => a.id.localeCompare(b.id));
 
         if (cart.length === 0) {
@@ -456,21 +390,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
                 cartItemsList.appendChild(listItem);
                 total += itemTotal;
+                totalItems += item.quantity;
             });
-            // Display total of items only, delivery cost will be shown in WhatsApp message
             cartTotalPrice.textContent = `${total.toFixed(2)} ${currentLanguage === 'ar' ? 'ج.م' : 'EGP'}`;
 
             if(paymentTriggerBtn) paymentTriggerBtn.style.display = 'block';
             if(cartItemsSection) cartItemsSection.style.display = 'block';
             if(paymentFormContainer) paymentFormContainer.style.display = 'none';
-
         }
-        updateCartButtonCounter();
+        
+        updateCartIconCounters(totalItems);
     }
 
-    function updateCartButtonCounter() {
-        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-        // In a real app, you'd update a counter on the cart icon itself.
+    // Function to update the item count on cart icons
+    function updateCartIconCounters(count) {
+        const floatingCartCounter = cartItemCountFloating; // Use the variable defined earlier
+        
+        if (floatingCartCounter) {
+            if (count > 0) {
+                floatingCartCounter.textContent = count;
+                floatingCartCounter.style.display = 'flex';
+            } else {
+                floatingCartCounter.style.display = 'none';
+            }
+        }
+
+        // If you have a counter for the header cart button, update it here.
+        // For example, if you had <span id="header-cart-counter"></span> in your header nav:
+        // const headerCartCounter = document.getElementById('header-cart-counter');
+        // if (headerCartCounter) {
+        //     if (count > 0) {
+        //         headerCartCounter.textContent = count;
+        //         headerCartCounter.style.display = 'inline-block';
+        //     } else {
+        //         headerCartCounter.style.display = 'none';
+        //     }
+        // }
     }
 
     // --- Event Listeners ---
@@ -485,9 +440,17 @@ document.addEventListener('DOMContentLoaded', () => {
         darkModeToggleBtn.addEventListener('click', toggleDarkMode);
     }
 
-    // Cart Button - Open Modal
+    // Cart Button - Open Modal (Header Cart Button)
     if (cartButton) {
         cartButton.addEventListener('click', openCartModal);
+    }
+
+    // Floating Cart Button - Open Modal
+    if (floatingCartButton) {
+        floatingCartButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            openCartModal();
+        });
     }
 
     // Close Modal Button
@@ -507,14 +470,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add to Cart Buttons & Quantity Control
     document.querySelectorAll('.product-card').forEach(card => {
         const productId = card.querySelector('.add-to-cart').dataset.id;
-        const addToCartButton = card.querySelector('.add-to-cart'); // The checkbox label itself
+        const addToCartButton = card.querySelector('.input.add-to-cart'); // The checkbox itself
         const minusBtn = card.querySelector('.minus-btn');
         const plusBtn = card.querySelector('.plus-btn');
-        const quantityInput = card.querySelector('.quantity-input');
 
-        // Handle adding to cart via the checkbox (it's still the trigger)
         addToCartButton.addEventListener('click', (e) => {
-            if (e.target.checked) { // Only add if it's being checked
+            if (e.target.checked) {
                 const productName = card.querySelector('.product-title').textContent;
                 const productPriceStr = card.querySelector('.product-price').textContent.replace(/[^0-9.-]+/g, "");
                 const productPrice = parseFloat(productPriceStr);
@@ -523,15 +484,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     addToCart(productId, productName, productPrice);
                 } else {
                     console.error('Could not get product details for:', card);
-                    e.target.checked = false; // Uncheck if failed
+                    e.target.checked = false;
                 }
             } else {
-                // If unchecked (meaning removed from cart), handle removal logic
                 removeItemFromCart(productId);
             }
         });
 
-        // Quantity Controls
         if (minusBtn) {
             minusBtn.addEventListener('click', () => updateQuantity(productId, -1));
         }
@@ -558,7 +517,6 @@ document.addEventListener('DOMContentLoaded', () => {
         finalCheckoutBtn.addEventListener('click', handleOrderSubmission);
     }
     
-    // Add event listeners to payment option buttons (if kept)
     paymentOptionsButtons.forEach(button => {
         button.addEventListener('click', () => {
             paymentOptionsButtons.forEach(btn => btn.classList.remove('selected'));
@@ -569,27 +527,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Initial Setup ---
     applyLanguage(currentLanguage);
     applyDarkMode(currentMode);
-    updateCartDisplay(); // To ensure cart is displayed correctly if items were saved (optional)
-    updateContactFormPlaceholders(currentLanguage); // Ensure contact placeholders are correct on load
-    updateDeliveryFormPlaceholders(currentLanguage); // Ensure delivery placeholders are correct on load
-
-    // Ensure the delivery form is hidden initially and cart section is visible
-    if (paymentFormContainer) paymentFormContainer.style.display = 'none';
-    if (cartItemsSection) cartItemsSection.style.display = 'block';
+    updateCartDisplay();
+    updateContactFormPlaceholders(currentLanguage);
+    updateDeliveryFormPlaceholders(currentLanguage);
 });
 
 // --- Mobile Menu Toggle ---
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => { // This is a duplicate DOMContentLoaded, it might be better to combine if all event listeners are here
   const menuIcon = document.getElementById('menu-icon');
   const navLinks = document.getElementById('nav-links');
 
   if (menuIcon && navLinks) {
     menuIcon.addEventListener('click', () => {
       navLinks.classList.toggle('active');
-      menuIcon.classList.toggle('active'); // Toggle active class on menu icon too
+      menuIcon.classList.toggle('active');
     });
     
-    // Close menu when a link is clicked
     navLinks.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => {
         navLinks.classList.remove('active');
@@ -602,23 +555,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const darkModeToggle = document.getElementById('dark-mode-toggle');
   const body = document.body;
 
-  const savedTheme = localStorage.getItem('theme'); // Using 'theme' from previous code, or 'darkMode' from current
+  const savedTheme = localStorage.getItem('darkMode');
   if (savedTheme === 'dark') {
     body.classList.add('dark-mode');
   } else {
-    // Ensure it's light if not dark (in case of inconsistencies)
     body.classList.remove('dark-mode');
   }
 
   darkModeToggle.addEventListener('click', () => {
     body.classList.toggle('dark-mode');
     if (body.classList.contains('dark-mode')) {
-      localStorage.setItem('theme', 'dark');
-      localStorage.setItem('darkMode', 'dark'); // Syncing with the variable used in the main script
+      localStorage.setItem('darkMode', 'dark');
     } else {
-      localStorage.setItem('theme', 'light');
       localStorage.setItem('darkMode', 'light');
     }
   });
 });
-
